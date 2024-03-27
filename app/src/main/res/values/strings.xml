@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Linked Listing</string>
+    <string name="title_inventory">Inventory</string>
+    <string name="title_listings">Listings</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_profile">Profile</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+
+    <string name="profile">Profile</string>
+
+</resources>
