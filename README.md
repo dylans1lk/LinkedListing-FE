@@ -1,6 +1,6 @@
 # Linked Listing
 
-This repository contains the front end portion of the Linked Listing app, created using Android Studios.
+This repository contains the front end portion of the Linked Listing app, created using Android Studio.
 
 ## Table of Contents
 
