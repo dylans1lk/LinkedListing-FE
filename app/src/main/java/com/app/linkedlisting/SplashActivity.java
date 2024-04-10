@@ -15,8 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -31,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance(); // Initialize Firestore
+        mFirestore = FirebaseFirestore.getInstance();
 
         emailEditText = findViewById(R.id.usernameOrEmailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -71,14 +71,23 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void lookupEmailFromUsername(String username, String password) {
-        mFirestore.collection("usernames").document(username).get().addOnSuccessListener(documentSnapshot -> {
-            String email = documentSnapshot.getString("email"); // Make sure "email" matches the field in Firestore
-            if (email != null) {
-                signInWithEmail(email, password);
-            } else {
-                Toast.makeText(SplashActivity.this, "Username not found.", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(e -> Toast.makeText(SplashActivity.this, "Error checking username.", Toast.LENGTH_SHORT).show());
+        mFirestore.collection("Users")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String email = document.getString("email");
+                            if (email != null) {
+                                signInWithEmail(email, password);
+                                return;
+                            }
+                        }
+                        Toast.makeText(SplashActivity.this, "Username not found.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SplashActivity.this, "Error checking username.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void signInWithEmail(String email, String password) {

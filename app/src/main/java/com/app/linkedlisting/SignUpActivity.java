@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -45,49 +44,40 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        // Check if username is unique
-        mFirestore.collection("usernames").document(username).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Toast.makeText(SignUpActivity.this, "Username already taken.", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Username is unique, proceed with registration
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(SignUpActivity.this, task1 -> {
-                                if (task1.isSuccessful()) {
-                                    // Save username in Firestore
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    if (user != null) {
-                                        String userId = user.getUid();
-                                        mFirestore.collection("usernames").document(username).set(new User(username, userId))
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(SignUpActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
-                                                    // Navigate to MainActivity or Login
-                                                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
-                                                })
-                                                .addOnFailureListener(e -> Toast.makeText(SignUpActivity.this, "Failed to save username.", Toast.LENGTH_SHORT).show());
-                                    }
-                                } else {
-                                    Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            } else {
-                Toast.makeText(SignUpActivity.this, "Failed to check username uniqueness.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Directly proceed with registration, no need to check for username uniqueness
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(SignUpActivity.this, task -> {
+                    if (task.isSuccessful()) {
+                        // Save user data in Firestore under the 'Users' collection
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
+                            User user = new User(username, email, userId);
+                            mFirestore.collection("Users").document(userId).set(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(SignUpActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+                                        // Navigate to MainActivity or Login
+                                        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show());
+                        }
+                    } else {
+                        Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    // Assuming you have a User class to structure the data for Firestore
+    // Updated User class to structure the data for Firestore
     class User {
         public String username;
+        public String email;
         public String userId;
 
-        User(String username, String userId) {
+        User(String username, String email, String userId) {
             this.username = username;
+            this.email = email;
             this.userId = userId;
         }
     }
