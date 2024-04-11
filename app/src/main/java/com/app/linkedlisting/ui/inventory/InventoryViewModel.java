@@ -13,7 +13,6 @@ public class InventoryViewModel extends ViewModel {
     // This text is temporarily here to ensure the correct pages are being navigated to.
     public InventoryViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is inventory fragment");
     }
 
     public LiveData<String> getText() {

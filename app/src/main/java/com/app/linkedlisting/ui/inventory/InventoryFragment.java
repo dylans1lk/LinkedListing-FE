@@ -1,5 +1,3 @@
-// This is the INVENTORY FRAGMENT aka the definition of the inventory page's display/layout
-// Here we convert the corresponding XML file into the corresponding ViewModel objects.
 package com.app.linkedlisting.ui.inventory;
 
 import android.os.Bundle;
@@ -10,16 +8,16 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.app.linkedlisting.databinding.FragmentInventoryBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class InventoryFragment extends Fragment {
 
     private FragmentInventoryBinding binding;
 
-    // This section helps establish the fragment's UI via updating/initializing
-    // the layout and the ViewModel
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         InventoryViewModel homeViewModel =
@@ -28,10 +26,24 @@ public class InventoryFragment extends Fragment {
         binding = FragmentInventoryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Changes the text that's being displayed based on any changes in the LiveData
         final TextView textView = binding.textInventory;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        // Set up the FloatingActionButton click listener using View Binding
+        binding.addItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAddItemDialog();
+            }
+        });
+
         return root;
+    }
+
+    private void showAddItemDialog() {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        AddItemDialogFragment addItemDialog = new AddItemDialogFragment();
+        addItemDialog.show(fragmentManager, "AddItemDialog");
     }
 
     @Override
