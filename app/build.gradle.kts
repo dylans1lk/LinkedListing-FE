@@ -57,6 +57,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore:24.1.0")
     implementation ("com.google.android.material:material:1.4.0")
     implementation ("com.google.firebase:firebase-storage:20.0.0")
+    implementation ("com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta01")
 
     implementation ("com.github.bumptech.glide:glide:4.13.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.13.0")
