@@ -1,11 +1,12 @@
 package com.app.linkedlisting.ui.inventory;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AddItemDialogFragment extends DialogFragment {
+    private static final int PICK_IMAGE_REQUEST = 1;
     private FragmentAddInventoryDialogBinding binding;
 
     @NonNull
@@ -29,8 +31,30 @@ public class AddItemDialogFragment extends DialogFragment {
                 .setTitle("Add New Item")
                 .setPositiveButton("Add", (dialog, id) -> attemptSaveItem())
                 .setNegativeButton("Cancel", (dialog, id) -> dismiss());
+
+        binding.uploadImageButton.setOnClickListener(v -> openImageChooser());
         return builder.create();
     }
+
+    private void openImageChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            try {
+                binding.itemImagePreview.setImageURI(data.getData());  // Display the selected image
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void attemptSaveItem() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
