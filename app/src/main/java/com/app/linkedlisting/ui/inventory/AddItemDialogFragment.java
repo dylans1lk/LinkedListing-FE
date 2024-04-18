@@ -50,11 +50,10 @@ public class AddItemDialogFragment extends DialogFragment {
             try {
                 binding.itemImagePreview.setImageURI(data.getData());  // Display the selected image
             } catch (Exception e) {
-                Toast.makeText(getContext(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                safelyShowToast("Failed to load image: " + e.getMessage());
             }
         }
     }
-
 
     private void attemptSaveItem() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -70,14 +69,16 @@ public class AddItemDialogFragment extends DialogFragment {
             FirebaseFirestore.getInstance()
                     .collection("Users").document(userId).collection("Inventory")
                     .add(item)
-                    .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(getContext(), "Item added successfully", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error adding item: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+                    .addOnSuccessListener(documentReference -> safelyShowToast("Item added successfully"))
+                    .addOnFailureListener(e -> safelyShowToast("Error adding item: " + e.getMessage()));
         } else {
-            Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+            safelyShowToast("User is not logged in.");
+        }
+    }
+
+    private void safelyShowToast(String message) {
+        if (isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
 
