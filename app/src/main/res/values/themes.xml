@@ -2,7 +2,6 @@
     <!-- Base application theme. -->
     <style name="Theme.LinkedListing" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/lightBlue</item>
         <item name="colorPrimaryVariant">@color/medBlue</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -12,6 +11,16 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <!-- Custom ActionBar style -->
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="MyActionBar" parent="Widget.MaterialComponents.ActionBar.Solid">
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <!-- Other padding or margin items can be set to 0dp if needed -->
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
     </style>
 </resources>

@@ -11,5 +11,18 @@
     <string name="signup">Sign Up</string>
 
     <string name="profile">Profile</string>
+    <string name="add_item">Add Item</string>
+    <string name="item_name">Add Item</string>
+
+    <string name="itemName">Item Name</string>
+    <string name="condition">Condition</string>
+    <string name="date_listed">Date Listed</string>
+    <string name="description">Description</string>
+    <string name="price">Price</string>
+
+    <string name="image_preview">Image Preview</string>
+    <string name="upload_image">Upload Image</string>
+
+
 
 </resources>
