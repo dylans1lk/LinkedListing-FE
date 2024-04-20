@@ -4,71 +4,34 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.app.linkedlisting.databinding.FragmentInventoryBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.app.linkedlisting.databinding.FragmentInventoryBinding;  // Updated import to use FragmentInventoryBinding
 
 public class InventoryFragment extends Fragment {
 
-    private FragmentInventoryBinding binding;
-    private InventoryAdapter inventoryAdapter;
-    private List<InventoryItem> inventoryItems = new ArrayList<>();
+    private FragmentInventoryBinding binding;  // Updated binding type to match the new layout file
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentInventoryBinding.inflate(inflater, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        InventoryViewModel inventoryViewModel =
+                new ViewModelProvider(this).get(InventoryViewModel.class);  // Ensure correct ViewModel usage
+
+        binding = FragmentInventoryBinding.inflate(inflater, container, false);  // Updated to use FragmentInventoryBinding
         View root = binding.getRoot();
 
-        setupRecyclerView();
-        loadInventoryItems();
-
-        binding.addItemButton.setOnClickListener(view -> showAddItemDialog());
-
+        final TextView textView = binding.textInventory;  // Update ID based on actual ID in fragment_inventory.xml
+        inventoryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
-    }
-
-    private void setupRecyclerView() {
-        binding.inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        inventoryAdapter = new InventoryAdapter(getContext(), inventoryItems);
-        binding.inventoryRecyclerView.setAdapter(inventoryAdapter);
-    }
-
-    private void loadInventoryItems() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(userId).collection("Inventory")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    inventoryItems.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        InventoryItem item = document.toObject(InventoryItem.class);
-                        inventoryItems.add(item);
-                    }
-                    inventoryAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    // Log or handle any errors here.
-                });
-    }
-
-    private void showAddItemDialog() {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        AddItemDialogFragment addItemDialog = new AddItemDialogFragment();
-        addItemDialog.show(fragmentManager, "AddItemDialog");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        binding = null;  // Properly cleanup the binding to avoid memory leaks
     }
 }

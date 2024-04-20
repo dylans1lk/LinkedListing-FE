@@ -1,16 +1,16 @@
-package com.app.linkedlisting.ui.inventory;
+package com.app.linkedlisting.ui.listings;
 
-public class InventoryItem {
+public class ListingItem {
     private String id;
     private String name;
     private String imageUrl;
     private String price;  // Changed from double to String
 
-    public InventoryItem() {
+    public ListingItem() {
         // Required empty public constructor for Firebase
     }
 
-    public InventoryItem(String id, String name, String imageUrl, String price) {
+    public ListingItem(String id, String name, String imageUrl, String price) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;

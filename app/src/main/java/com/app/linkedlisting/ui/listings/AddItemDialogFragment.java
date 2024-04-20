@@ -1,4 +1,4 @@
-package com.app.linkedlisting.ui.inventory;
+package com.app.linkedlisting.ui.listings;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -19,18 +19,17 @@ import com.google.firebase.storage.StorageReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import com.app.linkedlisting.databinding.FragmentAddInventoryDialogBinding;
+import com.app.linkedlisting.databinding.FragmentAddListingDialogBinding;
 import android.util.Log;
-
 
 public class AddItemDialogFragment extends DialogFragment {
     private static final int PICK_IMAGE_REQUEST = 1;
-    private FragmentAddInventoryDialogBinding binding;
+    private FragmentAddListingDialogBinding binding;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        binding = FragmentAddInventoryDialogBinding.inflate(LayoutInflater.from(getContext()));
+        binding = FragmentAddListingDialogBinding.inflate(LayoutInflater.from(getContext()));
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setView(binding.getRoot())
                 .setTitle("Add New Item")
@@ -56,25 +55,22 @@ public class AddItemDialogFragment extends DialogFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
             Uri selectedImageUri = data.getData();
-            Glide.with(this)
-                    .load(selectedImageUri)
-                    .into(binding.itemImagePreview);
+            Glide.with(this).load(selectedImageUri).into(binding.itemImagePreview);
             uploadImageToFirebaseStorage(selectedImageUri);
         }
     }
+
     private void uploadImageToFirebaseStorage(Uri imageUri) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         final StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
         imageRef.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     Log.d("UploadImage", "Image uploaded successfully");
-                    // As soon as the image is uploaded successfully, get the download URL.
                     imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String imageUrl = uri.toString();
-                        Log.d("DownloadUrl", "Image URL: " + imageUrl); // Logging the URL
-                        if (isAdded()) {  // Check if the fragment is still attached
+                        Log.d("DownloadUrl", "Image URL: " + imageUrl);
+                        if (isAdded()) {
                             Glide.with(this).load(uri).into(binding.itemImagePreview);
-                            // Directly update Firestore with the new image URL
                             updateFirestore(imageUrl);
                         }
                     }).addOnFailureListener(e -> {
@@ -100,7 +96,8 @@ public class AddItemDialogFragment extends DialogFragment {
             item.put("price", binding.itemPrice.getText().toString());
             item.put("imageUrl", imageUrl);
 
-            FirebaseFirestore.getInstance().collection("Users").document(userId).collection("Inventory")
+            // Change the Firestore collection path from "Inventory" to "Listings"
+            FirebaseFirestore.getInstance().collection("Users").document(userId).collection("Listings")
                     .add(item)
                     .addOnSuccessListener(documentReference -> {
                         Log.d("FirestoreSave", "Item added successfully with Image URL: " + imageUrl);
@@ -128,8 +125,9 @@ public class AddItemDialogFragment extends DialogFragment {
             item.put("price", binding.itemPrice.getText().toString());
             item.put("imageUrl", imageUrl);
 
+            // Update Firestore path from "Inventory" to "Listings"
             FirebaseFirestore.getInstance()
-                    .collection("Users").document(userId).collection("Inventory")
+                    .collection("Users").document(userId).collection("Listings")
                     .add(item)
                     .addOnSuccessListener(documentReference -> {
                         Log.d("FirestoreSave", "Item added successfully with Image URL: " + imageUrl);
@@ -145,7 +143,7 @@ public class AddItemDialogFragment extends DialogFragment {
     }
 
     private void attemptSaveItem() {
-        attemptSaveItem(null);
+        attemptSaveItem(null); // Calls the above method with null if no image URL is provided directly
     }
 
     private void safelyShowToast(String message) {
@@ -157,6 +155,7 @@ public class AddItemDialogFragment extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // Correctly nullify the binding to avoid memory leaks
+        binding = null; // Nullifying the binding to avoid memory leaks
     }
 }
+
