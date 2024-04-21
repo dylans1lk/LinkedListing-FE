@@ -124,8 +124,8 @@ public class AddItemDialogFragment extends DialogFragment {
             item.put("description", binding.itemDescription.getText().toString());
             item.put("price", binding.itemPrice.getText().toString());
             item.put("imageUrl", imageUrl);
+            item.put("posted", false);  // Set posted to false
 
-            // Update Firestore path from "Inventory" to "Listings"
             FirebaseFirestore.getInstance()
                     .collection("Users").document(userId).collection("Listings")
                     .add(item)

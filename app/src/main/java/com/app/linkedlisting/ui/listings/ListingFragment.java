@@ -8,8 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.app.linkedlisting.databinding.FragmentListingsBinding; // Updated import
+import android.util.Log;
+import com.app.linkedlisting.databinding.FragmentListingsBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -19,16 +19,17 @@ import java.util.List;
 
 public class ListingFragment extends Fragment {
 
-    private FragmentListingsBinding binding; // Updated binding type
+    private FragmentListingsBinding binding;
     private ListingAdapter listingAdapter;
-    private List<ListingItem> inventoryItems = new ArrayList<>();
+    private List<ListingItem> listingItems = new ArrayList<>();
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentListingsBinding.inflate(inflater, container, false); // Updated method call
+        binding = FragmentListingsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         setupRecyclerView();
-        loadInventoryItems();
+        loadListingItems();
 
         binding.addItemButton.setOnClickListener(view -> showAddItemDialog());
 
@@ -37,25 +38,26 @@ public class ListingFragment extends Fragment {
 
     private void setupRecyclerView() {
         binding.inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        listingAdapter = new ListingAdapter(getContext(), inventoryItems);
+        listingAdapter = new ListingAdapter(getContext(), listingItems);
         binding.inventoryRecyclerView.setAdapter(listingAdapter);
     }
 
-    private void loadInventoryItems() {
+    private void loadListingItems() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(userId).collection("Inventory")
+        db.collection("Users").document(userId).collection("Listings")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    inventoryItems.clear();
+                    listingItems.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         ListingItem item = document.toObject(ListingItem.class);
-                        inventoryItems.add(item);
+                        listingItems.add(item);
                     }
                     listingAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
-                    // Log or handle any errors here.
+                    // Ideally handle errors in a user-friendly way and log them.
+                    Log.e("FirestoreLoadError", "Failed to load listings", e);
                 });
     }
 
@@ -68,6 +70,6 @@ public class ListingFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // Correctly nullify the binding to avoid memory leaks
+        binding = null;  // Preventing memory leaks by nullifying the binding when view is destroyed
     }
 }
