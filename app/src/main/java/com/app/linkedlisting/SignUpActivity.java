@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -44,11 +45,24 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        // Directly proceed with registration, no need to check for username uniqueness
+        mAuth.fetchSignInMethodsForEmail(email)
+                .addOnCompleteListener(task -> {
+                    boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
+                    if (isNewUser) {
+                        createUserAccount(email, password, username);
+                    } else {
+                        Toast.makeText(SignUpActivity.this, "Email already in use. Please use a different email.", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(SignUpActivity.this, "Failed to check email: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void createUserAccount(String email, String password, String username) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(SignUpActivity.this, task -> {
+                .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Save user data in Firestore under the 'Users' collection
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             String userId = firebaseUser.getUid();
@@ -56,7 +70,6 @@ public class SignUpActivity extends AppCompatActivity {
                             mFirestore.collection("Users").document(userId).set(user)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(SignUpActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
-                                        // Navigate to MainActivity or Login
                                         Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finish();
@@ -64,12 +77,25 @@ public class SignUpActivity extends AppCompatActivity {
                                     .addOnFailureListener(e -> Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show());
                         }
                     } else {
-                        Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        String errorCode = ((FirebaseAuthException) task.getException()).getErrorCode();
+                        handleSignUpError(errorCode);
                     }
                 });
     }
 
-    // Updated User class to structure the data for Firestore
+    private void handleSignUpError(String errorCode) {
+        String message;
+        switch (errorCode) {
+            case "ERROR_EMAIL_ALREADY_IN_USE":
+                message = "The email address is already in use by another account.";
+                break;
+            default:
+                message = "Authentication failed.";
+                break;
+        }
+        Toast.makeText(SignUpActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
     class User {
         public String username;
         public String email;

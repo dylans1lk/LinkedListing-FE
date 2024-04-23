@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,14 +7,14 @@
     <fragment
         android:id="@+id/navigation_inventory"
         android:name="com.app.linkedlisting.ui.inventory.InventoryFragment"
-        android:label="@string/title_inventory"
-        tools:layout="@layout/fragment_inventory" />
+    android:label="@string/title_inventory"
+    tools:layout="@layout/fragment_inventory" />
 
     <fragment
         android:id="@+id/navigation_listings"
-        android:name="com.app.linkedlisting.ui.listings.ListingsFragment"
-        android:label="@string/title_listings"
-        tools:layout="@layout/fragment_listings" />
+        android:name="com.app.linkedlisting.ui.listings.ListingFragment"
+    android:label="@string/title_listings"
+    tools:layout="@layout/fragment_listings" />
 
     <fragment
         android:id="@+id/navigation_messages"
