@@ -23,6 +23,9 @@
     <string name="image_preview">Image Preview</string>
     <string name="upload_image">Upload Image</string>
 
+    <string name="minimum_amount">Min. # Of Supply for Alert</string>
+    <string name="current_amount">Current # of Supply</string>
+
 
 
 </resources>
