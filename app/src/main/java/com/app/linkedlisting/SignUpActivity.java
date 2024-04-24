@@ -35,17 +35,57 @@ public class SignUpActivity extends AppCompatActivity {
         signupButton.setOnClickListener(v -> registerUser());
     }
 
-    private void registerUser() {
-        String username = usernameEditText.getText().toString().trim();
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
+    public EditText getUsernameEditText() {
+        return usernameEditText;
+    }
+
+    public void setUsernameEditText(EditText usernameEditText) {
+        this.usernameEditText = usernameEditText;
+    }
+
+    public EditText getEmailEditText() {
+        return emailEditText;
+    }
+
+    public void setEmailEditText(EditText emailEditText) {
+        this.emailEditText = emailEditText;
+    }
+
+    public EditText getPasswordEditText() {
+        return passwordEditText;
+    }
+
+    public void setPasswordEditText(EditText passwordEditText) {
+        this.passwordEditText = passwordEditText;
+    }
+
+    public FirebaseAuth getAuth() {
+        return mAuth;
+    }
+
+    public void setAuth(FirebaseAuth mAuth) {
+        this.mAuth = mAuth;
+    }
+
+    public FirebaseFirestore getFirestore() {
+        return mFirestore;
+    }
+
+    public void setFirestore(FirebaseFirestore mFirestore) {
+        this.mFirestore = mFirestore;
+    }
+
+    public void registerUser() {
+        String username = getUsernameEditText().getText().toString().trim();
+        String email = getEmailEditText().getText().toString().trim();
+        String password = getPasswordEditText().getText().toString().trim();
 
         if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             Toast.makeText(SignUpActivity.this, "Please fill all fields.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        mAuth.fetchSignInMethodsForEmail(email)
+        getAuth().fetchSignInMethodsForEmail(email)
                 .addOnCompleteListener(task -> {
                     boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
                     if (isNewUser) {
@@ -60,14 +100,14 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void createUserAccount(String email, String password, String username) {
-        mAuth.createUserWithEmailAndPassword(email, password)
+        getAuth().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        FirebaseUser firebaseUser = getAuth().getCurrentUser();
                         if (firebaseUser != null) {
                             String userId = firebaseUser.getUid();
                             User user = new User(username, email, userId);
-                            mFirestore.collection("Users").document(userId).set(user)
+                            getFirestore().collection("Users").document(userId).set(user)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(SignUpActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(SignUpActivity.this, MainActivity.class);

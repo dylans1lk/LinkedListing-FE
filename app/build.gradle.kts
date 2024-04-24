@@ -63,4 +63,22 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.13.0")
 
 
+    testImplementation("junit:junit:4.13.2")
+
+
+    // Unit Tests
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:4.0.0")
+    testImplementation("org.robolectric:robolectric:4.6")
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+
+// Android Instrumented Tests
+    testImplementation("androidx.test:core:1.2.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.4.0")
+    androidTestImplementation("org.mockito:mockito-android:4.0.0")
+
+
 }
